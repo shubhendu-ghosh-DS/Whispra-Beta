@@ -1,4 +1,14 @@
-// ======= SIGNUP =========
+// ========== ENCODE / DECODE FUNCTIONS ==========
+// Simple Base64 encoding/decoding (you can replace with AES)
+function encodeMessage(message) {
+  return btoa(unescape(encodeURIComponent(message)));
+}
+
+function decodeMessage(encoded) {
+  return decodeURIComponent(escape(atob(encoded)));
+}
+
+// ========== SIGNUP ==========
 const signupForm = document.getElementById('signup-form');
 if (signupForm) {
   signupForm.addEventListener('submit', async (e) => {
@@ -16,7 +26,6 @@ if (signupForm) {
       const data = await res.json();
       if (res.ok) {
         alert('Signup successful! Login now.');
-        // Route to Flask's /login route instead of static login.html
         window.location.href = '/login';
       } else {
         alert(data.detail || 'Signup failed.');
@@ -27,7 +36,7 @@ if (signupForm) {
   });
 }
 
-// ======= LOGIN =========
+// ========== LOGIN ==========
 const loginForm = document.getElementById('login-form');
 if (loginForm) {
   loginForm.addEventListener('submit', async (e) => {
@@ -46,8 +55,6 @@ if (loginForm) {
         localStorage.setItem('loggedIn', true);
         localStorage.setItem('username', username);
         localStorage.setItem('password', password);
-
-        // Redirect to chat route handled by Flask
         window.location.href = '/chat';
       } else {
         alert(data.detail || 'Login failed.');
@@ -58,7 +65,7 @@ if (loginForm) {
   });
 }
 
-// ======= CHAT LOGIC =========
+// ========== CHAT LOGIC ==========
 const messagesDiv = document.getElementById('messages');
 const chatUsersList = document.getElementById('chat-users');
 const messageInput = document.getElementById('message-input');
@@ -74,7 +81,6 @@ if (messagesDiv && chatUsersList) {
     window.location.href = 'login.html';
   }
 
-  // Start scanning messages every 5 seconds
   setInterval(scanMessages, 5000);
   scanMessages();
 }
@@ -90,18 +96,19 @@ async function scanMessages() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     });
-    const data = await res.json();
 
+    const data = await res.json();
     const messages = data.messages || [];
     let newMessageFound = false;
 
     messages.forEach(msg => {
       const fromUser = msg.from_username;
       const toUser = msg.to_username || username;
-
       const otherUser = (fromUser === username) ? toUser : fromUser;
-      const messageId = `${fromUser}-${msg.message}-${msg.timestamp || Date.now()}`;
 
+      const decodedMsg = decodeMessage(msg.message);
+
+      const messageId = `${fromUser}-${decodedMsg}-${msg.timestamp || Date.now()}`;
       if (!messageIds[messageId]) {
         messageIds[messageId] = true;
 
@@ -109,7 +116,10 @@ async function scanMessages() {
           chatHistory[otherUser] = [];
         }
 
-        chatHistory[otherUser].push(msg);
+        chatHistory[otherUser].push({
+          ...msg,
+          message: decodedMsg
+        });
         newMessageFound = true;
       }
     });
@@ -143,10 +153,10 @@ function displayMessages(user) {
 
     if (msg.from_username === username) {
       p.classList.add('sent');
-      p.textContent = `${msg.message}`;
+      p.textContent = msg.message;
     } else {
       p.classList.add('received');
-      p.textContent = `${msg.message}`;
+      p.textContent = msg.message;
     }
 
     messagesDiv.appendChild(p);
@@ -195,6 +205,8 @@ async function sendMessage() {
   const message = messageInput.value.trim();
   if (!message) return alert('Message cannot be empty!');
 
+  const encodedMessage = encodeMessage(message);
+
   try {
     const res = await fetch('https://shubhendu-ghosh-whispra.hf.space/send_message', {
       method: 'POST',
@@ -203,7 +215,7 @@ async function sendMessage() {
         from_username: fromUser,
         password,
         to_username: toUser,
-        message
+        message: encodedMessage
       })
     });
 
@@ -213,7 +225,7 @@ async function sendMessage() {
       const newMsg = {
         from_username: fromUser,
         to_username: toUser,
-        message,
+        message, // store decoded for frontend display
         timestamp: Date.now()
       };
 
@@ -222,6 +234,7 @@ async function sendMessage() {
       }
 
       chatHistory[toUser].push(newMsg);
+
       const messageId = `${fromUser}-${message}-${newMsg.timestamp}`;
       messageIds[messageId] = true;
 
@@ -240,7 +253,7 @@ async function sendMessage() {
 
 function logout() {
   localStorage.clear();
-  window.location.href = '/';  // Go to signup page
+  window.location.href = '/';
 }
 
 if (newUserBtn) {
