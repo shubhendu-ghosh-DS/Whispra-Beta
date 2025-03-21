@@ -243,3 +243,19 @@ body, html {
 .form-container a:hover {
   text-decoration: underline;
 }
+
+/* ====== App Branding ====== */
+.app-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.app-title .beta {
+  color: #3498db; /* Blue color for Beta */
+  font-size: 16px;
+  font-weight: normal;
+  margin-left: 8px;
+  vertical-align: super;
+}
