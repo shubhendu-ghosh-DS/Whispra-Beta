@@ -13,7 +13,18 @@
     <aside class="sidebar">
       <header>
         <h2>Chats</h2>
+        <!-- 🔍 Search Bar for Friends -->
+        <div class="search-container">
+          <input
+            type="text"
+            id="search-friends-input"
+            class="search-input"
+            placeholder="Search friends..."
+            onkeyup="searchFriends()"
+          />
+        </div>
       </header>
+
       <ul id="chat-users" class="user-list">
         <!-- Users will be listed here -->
       </ul>
@@ -35,7 +46,12 @@
 
       <footer class="chat-input-area">
         <div class="input-container">
-          <input type="text" id="message-input" class="message-input" placeholder="Type your message..." />
+          <input
+            type="text"
+            id="message-input"
+            class="message-input"
+            placeholder="Type your message..."
+          />
           <button class="send-btn" onclick="sendMessage()">Send</button>
         </div>
       </footer>
