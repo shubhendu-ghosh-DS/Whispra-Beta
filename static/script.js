@@ -1,12 +1,3 @@
-// ========== ENCODE / DECODE FUNCTIONS ==========
-// Simple Base64 encoding/decoding (you can replace with AES)
-function encodeMessage(message) {
-  return btoa(unescape(encodeURIComponent(message)));
-}
-
-function decodeMessage(encoded) {
-  return decodeURIComponent(escape(atob(encoded)));
-}
 
 // ========== SIGNUP ==========
 const signupForm = document.getElementById('signup-form');
@@ -66,24 +57,34 @@ if (loginForm) {
 }
 
 // ========== CHAT LOGIC ==========
+
 const messagesDiv = document.getElementById('messages');
 const chatUsersList = document.getElementById('chat-users');
 const messageInput = document.getElementById('message-input');
 const currentChatHeading = document.getElementById('current-chat');
 const newUserBtn = document.getElementById('new-user-btn');
+const searchFriendsInput = document.getElementById('search-friends-input'); // New search input
 
 let currentRecipient = null;
 let chatHistory = {};
 let messageIds = {};
+let friendsList = []; // Store friends here
 
 if (messagesDiv && chatUsersList) {
   if (!localStorage.getItem('loggedIn')) {
     window.location.href = 'login.html';
   }
 
-  setInterval(scanMessages, 5000);
+  fetchFriends(); // Load friends when chat starts
+
+  setInterval(() => {
+    scanMessages();
+  }, 5000);
+
   scanMessages();
 }
+
+// ====================== SCAN MESSAGES ======================
 
 async function scanMessages() {
   const username = localStorage.getItem('username');
@@ -138,6 +139,8 @@ async function scanMessages() {
   }
 }
 
+// ====================== DISPLAY MESSAGES ======================
+
 function displayMessages(user) {
   if (!user) return;
 
@@ -165,36 +168,41 @@ function displayMessages(user) {
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-function updateUserList() {
+// ====================== UPDATE USER LIST ======================
+
+function updateUserList(filter = '') {
   chatUsersList.innerHTML = '';
   const users = Object.keys(chatHistory);
+  const filteredFriends = friendsList.filter(friend => friend.toLowerCase().includes(filter.toLowerCase()));
 
-  if (users.length === 0) {
+  if (filteredFriends.length === 0) {
     const li = document.createElement('li');
-    li.textContent = 'No chats yet';
+    li.textContent = 'No friends found';
     li.classList.add('empty-list');
     chatUsersList.appendChild(li);
     return;
   }
 
-  users.forEach(user => {
+  filteredFriends.forEach(friend => {
     const li = document.createElement('li');
-    li.textContent = user;
+    li.textContent = friend;
     li.classList.add('user-item');
 
-    if (user === currentRecipient) {
+    if (friend === currentRecipient) {
       li.classList.add('active');
     }
 
     li.onclick = () => {
-      currentRecipient = user;
-      displayMessages(user);
+      currentRecipient = friend;
+      displayMessages(friend);
       updateUserList();
     };
 
     chatUsersList.appendChild(li);
   });
 }
+
+// ====================== SEND MESSAGE ======================
 
 async function sendMessage() {
   const fromUser = localStorage.getItem('username');
@@ -225,7 +233,7 @@ async function sendMessage() {
       const newMsg = {
         from_username: fromUser,
         to_username: toUser,
-        message, // store decoded for frontend display
+        message,
         timestamp: Date.now()
       };
 
@@ -251,20 +259,106 @@ async function sendMessage() {
   }
 }
 
+// ====================== FETCH FRIENDS ======================
+
+async function fetchFriends() {
+  const username = localStorage.getItem('username');
+  const password = localStorage.getItem('password');
+  if (!username || !password) return;
+
+  try {
+    const res = await fetch(`https://shubhendu-ghosh-whispra.hf.space/get_friends?username=${username}&password=${password}`);
+    const data = await res.json();
+
+    if (res.ok) {
+      friendsList = data || [];
+      updateUserList();
+    } else {
+      console.error('Failed to fetch friends:', data.message);
+    }
+  } catch (err) {
+    console.error('Fetch friends error:', err);
+  }
+}
+
+// ====================== SAVE FRIEND ======================
+
+async function saveFriend(friendUsername) {
+  const username = localStorage.getItem('username');
+  const password = localStorage.getItem('password');
+  if (!username || !password) return;
+
+  try {
+    const res = await fetch('https://shubhendu-ghosh-whispra.hf.space/save_friends', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        password,
+        friend_username: friendUsername
+      })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert('Friend added successfully!');
+      if (!friendsList.includes(friendUsername)) {
+        friendsList.push(friendUsername);
+      }
+      updateUserList();
+    } else {
+      alert(data.message || 'Failed to add friend.');
+    }
+  } catch (err) {
+    console.error('Save friend error:', err);
+  }
+}
+
+// ====================== LOGOUT ======================
+
 function logout() {
   localStorage.clear();
   window.location.href = '/';
 }
 
+// ====================== EVENT LISTENERS ======================
+
 if (newUserBtn) {
   newUserBtn.addEventListener('click', () => {
-    const newUser = prompt('Enter new username to chat with:');
+    const newUser = prompt('Enter new friend\'s username to chat with:');
     if (newUser) {
-      currentRecipient = newUser.trim();
-      if (!currentRecipient) return;
-      currentChatHeading.textContent = `Chatting with ${currentRecipient}`;
-      displayMessages(currentRecipient);
+      const trimmedUser = newUser.trim();
+      if (!trimmedUser) return;
+
+      currentRecipient = trimmedUser;
+      saveFriend(trimmedUser); // Save new friend to backend
+      currentChatHeading.textContent = `Chatting with ${trimmedUser}`;
+      displayMessages(trimmedUser);
       updateUserList();
     }
   });
+}
+
+if (searchFriendsInput) {
+  searchFriendsInput.addEventListener('input', (e) => {
+    const searchTerm = e.target.value;
+    updateUserList(searchTerm);
+  });
+}
+
+// ====================== MESSAGE ENCODER / DECODER ======================
+
+function encodeMessage(message) {
+  // Implement your encoding logic here if needed.
+  return btoa(message);
+}
+
+function decodeMessage(encodedMessage) {
+  // Implement your decoding logic here if needed.
+  try {
+    return atob(encodedMessage);
+  } catch (e) {
+    return encodedMessage;
+  }
 }
