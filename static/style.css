@@ -171,6 +171,20 @@ body, html {
   background-color: #45a049;
 }
 
+
+.search-container {
+  margin-top: 10px;
+  padding: 0 10px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 /* ========= Login / Signup Forms ========= */
 
 .form-container {
@@ -259,3 +273,4 @@ body, html {
   margin-left: 8px;
   vertical-align: super;
 }
+
