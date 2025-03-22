@@ -102,7 +102,7 @@ async function scanMessages() {
     const messages = data.messages || [];
     let newMessageFound = false;
 
-    messages.forEach(msg => {
+    for (let msg of messages) {
       const fromUser = msg.from_username;
       const toUser = msg.to_username || username;
       const otherUser = (fromUser === username) ? toUser : fromUser;
@@ -110,20 +110,31 @@ async function scanMessages() {
       const decodedMsg = decodeMessage(msg.message);
 
       const messageId = `${fromUser}-${decodedMsg}-${msg.timestamp || Date.now()}`;
+
       if (!messageIds[messageId]) {
         messageIds[messageId] = true;
 
         if (!chatHistory[otherUser]) {
           chatHistory[otherUser] = [];
+
+          // New user found, check if they're in friendsList
+          if (!friendsList.includes(otherUser)) {
+            friendsList.push(otherUser);
+            updateUserList();
+
+            // Save new friend to backend
+            saveFriend(otherUser);
+          }
         }
 
         chatHistory[otherUser].push({
           ...msg,
           message: decodedMsg
         });
+
         newMessageFound = true;
       }
-    });
+    }
 
     if (newMessageFound) {
       updateUserList();
@@ -239,6 +250,12 @@ async function sendMessage() {
 
       if (!chatHistory[toUser]) {
         chatHistory[toUser] = [];
+
+        // If sending to a new friend, add to friends list and save backend
+        if (!friendsList.includes(toUser)) {
+          friendsList.push(toUser);
+          saveFriend(toUser);
+        }
       }
 
       chatHistory[toUser].push(newMsg);
@@ -256,6 +273,7 @@ async function sendMessage() {
     }
   } catch (err) {
     alert('Message send error.');
+    console.error(err);
   }
 }
 
@@ -302,13 +320,15 @@ async function saveFriend(friendUsername) {
     const data = await res.json();
 
     if (res.ok) {
-      alert('Friend added successfully!');
+      console.log(`Friend "${friendUsername}" added successfully!`);
+
       if (!friendsList.includes(friendUsername)) {
         friendsList.push(friendUsername);
       }
+
       updateUserList();
     } else {
-      alert(data.message || 'Failed to add friend.');
+      console.error(`Failed to add friend "${friendUsername}":`, data.message);
     }
   } catch (err) {
     console.error('Save friend error:', err);
@@ -332,7 +352,12 @@ if (newUserBtn) {
       if (!trimmedUser) return;
 
       currentRecipient = trimmedUser;
-      saveFriend(trimmedUser); // Save new friend to backend
+
+      if (!friendsList.includes(trimmedUser)) {
+        friendsList.push(trimmedUser);
+        saveFriend(trimmedUser); // Save new friend to backend
+      }
+
       currentChatHeading.textContent = `Chatting with ${trimmedUser}`;
       displayMessages(trimmedUser);
       updateUserList();
@@ -350,12 +375,10 @@ if (searchFriendsInput) {
 // ====================== MESSAGE ENCODER / DECODER ======================
 
 function encodeMessage(message) {
-  // Implement your encoding logic here if needed.
   return btoa(message);
 }
 
 function decodeMessage(encodedMessage) {
-  // Implement your decoding logic here if needed.
   try {
     return atob(encodedMessage);
   } catch (e) {
