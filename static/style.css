@@ -95,6 +95,17 @@ body, html {
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100px; 
+  }
+  
+  .sidebar header h2 {
+    font-size: 1rem;
+  }
+}
+
 .search-container {
   padding: 15px 20px;
   background: rgba(255, 255, 255, 0.05);
