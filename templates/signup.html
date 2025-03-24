@@ -4,9 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Signup - Whispra</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='modern-style.css') }}" />
 </head>
 <body>
+
+  <!-- Background Shapes -->
+  <div class="shape one"></div>
+  <div class="shape two"></div>
+  <div class="shape three"></div>
+  <div class="shape four"></div>
+
   <div class="form-container">
     
     <!-- App Title with Beta -->
@@ -23,6 +30,9 @@
     </form>
     <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
   </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
 
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
