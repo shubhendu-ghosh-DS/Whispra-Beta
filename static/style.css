@@ -1,11 +1,11 @@
-/* Reset + Base styles */
 body, html {
   margin: 0;
   padding: 0;
   font-family: 'Poppins', sans-serif;
   background: linear-gradient(135deg, #eceff1, #cfd8dc);
-  height: 100%;
-  /* overflow: hidden; */
+  height: 100vh; /* Change this */
+  width: 100%;
+  overflow: hidden; /* Optional, depending on whether you want scrolling */
   color: #333;
 }
 
@@ -74,6 +74,7 @@ body, html {
 
 /* Sidebar */
 .sidebar {
+  flex-shrink: 0;
   width: 300px;
   background: linear-gradient(135deg, #a31e8d, #4633f0, #096123); /* Updated to a professional gradient */
   color: #ffffff;
@@ -195,6 +196,7 @@ body, html {
 .main-chat {
   flex-grow: 1;
   display: flex;
+  overflow: hidden;
   flex-direction: column;
   background: #f5f7fa;
 }
