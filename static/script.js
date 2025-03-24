@@ -336,7 +336,6 @@ async function sendMessage() {
     messageInput.value = '';
     scanMessages();
 
-    showToast('Message sent!', 'success');
   } catch (err) {
     showToast('Message send error.', 'error');
     console.error('Send message catch error:', err);
