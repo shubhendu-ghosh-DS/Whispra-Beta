@@ -165,6 +165,18 @@ body, html {
   border-radius: 3px;
 }
 
+.sidebar.collapsed .search-container {
+  display: none;
+}
+
+.sidebar.collapsed .user-list {
+  display: none;
+}
+
+.sidebar.collapsed .h2 {
+  display: none;
+}
+
 .user-item {
   display: flex;
   align-items: center;
