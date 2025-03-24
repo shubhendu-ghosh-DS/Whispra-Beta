@@ -111,7 +111,7 @@ let friendsList = [];
 if (messagesDiv && chatUsersList) {
   if (!localStorage.getItem('loggedIn')) {
     showToast('You must be logged in to access chat.', 'error');
-    window.location.href = 'login.html';
+    window.location.href = '/';
   }
 
   fetchFriends();
@@ -418,34 +418,46 @@ function logout() {
 
 // ====================== EVENT LISTENERS ======================
 
+const newChatModal = document.getElementById('new-chat-modal');
+const newFriendInput = document.getElementById('new-friend-username');
+const startChatBtn = document.getElementById('start-chat-btn');
+const cancelChatBtn = document.getElementById('cancel-chat-btn');
+
+// Open the modal on button click
 if (newUserBtn) {
   newUserBtn.addEventListener('click', () => {
-    const newUser = prompt('Enter new friend\'s username to chat with:');
-    if (newUser) {
-      const trimmedUser = newUser.trim();
-      if (!trimmedUser) return;
-
-      currentRecipient = trimmedUser;
-
-      if (!friendsList.includes(trimmedUser)) {
-        friendsList.push(trimmedUser);
-        saveFriend(trimmedUser);
-      }
-
-      currentChatHeading.textContent = `Chatting with ${trimmedUser}`;
-      displayMessages(trimmedUser);
-      updateUserList();
-    }
+    newChatModal.classList.remove('hidden');
+    newFriendInput.value = '';  // Clear previous input
+    newFriendInput.focus();     // Auto focus
   });
 }
 
-if (searchFriendsInput) {
-  searchFriendsInput.addEventListener('input', (e) => {
-    const searchTerm = e.target.value;
-    updateUserList(searchTerm);
-  });
-}
+// Start chat on button click
+startChatBtn.addEventListener('click', () => {
+  const trimmedUser = newFriendInput.value.trim();
+  if (!trimmedUser) {
+    showToast('Please enter a username.', 'error');
+    return;
+  }
 
+  currentRecipient = trimmedUser;
+
+  if (!friendsList.includes(trimmedUser)) {
+    friendsList.push(trimmedUser);
+    saveFriend(trimmedUser);
+  }
+
+  currentChatHeading.textContent = `Chatting with ${trimmedUser}`;
+  displayMessages(trimmedUser);
+  updateUserList();
+
+  newChatModal.classList.add('hidden'); // Close modal
+});
+
+// Cancel button to close modal
+cancelChatBtn.addEventListener('click', () => {
+  newChatModal.classList.add('hidden');
+});
 
 // ====================== MESSAGE ENCODER / DECODER ======================
 
