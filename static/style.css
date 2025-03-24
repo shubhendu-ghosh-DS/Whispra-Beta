@@ -337,19 +337,24 @@ body, html {
 
 .chat-input-area {
   padding-left: 20px;
-  padding-top: 15px;
-  padding-bottom: 70px;
+  padding-top: 15px;   /* leave it as per your request */
+  padding-bottom: 70px; /* leave it as per your request */
   border-top: 1px solid #e0e0e0;
   background: #ffffff;
+  width: 100%; /* ensure full width */
+  box-sizing: border-box; /* makes padding part of width */
 }
 
 .input-container {
   display: flex;
   gap: 12px;
+  width: 100%; /* full width */
+  box-sizing: border-box; /* include padding/borders in width */
 }
 
 .message-input {
   flex-grow: 1;
+  min-width: 0; /* this is crucial to prevent overflow on flex children */
   padding: 12px 16px;
   border-radius: 25px;
   border: 1px solid #ccc;
@@ -363,6 +368,7 @@ body, html {
 }
 
 .send-btn {
+  flex-shrink: 0; /* prevent the button from shrinking */
   padding: 12px 20px;
   background: #2575fc;
   border: none;
