@@ -3,9 +3,9 @@ body, html {
   padding: 0;
   font-family: 'Poppins', sans-serif;
   background: linear-gradient(135deg, #eceff1, #cfd8dc);
-  height: 100vh; /* Change this */
+  height: 100vh; 
   width: 100%;
-  overflow: hidden; /* Optional, depending on whether you want scrolling */
+  overflow: hidden; 
   color: #333;
 }
 
@@ -85,7 +85,7 @@ body, html {
 }
 
 .sidebar.collapsed {
-  width: 60px; /* Adjust to how small you want it */
+  width: 60px; 
 }
 
 .sidebar header {
@@ -100,7 +100,7 @@ body, html {
 }
 
 .sidebar.collapsed header {
-  font-size: 0; /* or hide text */
+  font-size: 0; 
   padding: 20px 0;
 }
 
@@ -318,7 +318,7 @@ body, html {
 }
 
 .chat-message.received {
-  background: linear-gradient(135deg, #11998e, #38ef7d); /* Updated to a vibrant teal/green gradient */
+  background: linear-gradient(135deg, #11998e, #38ef7d); 
   color: #ffffff;
   margin-right: auto;
   text-align: left;
@@ -337,24 +337,24 @@ body, html {
 
 .chat-input-area {
   padding-left: 20px;
-  padding-top: 15px;   /* leave it as per your request */
-  padding-bottom: 70px; /* leave it as per your request */
+  padding-top: 15px;   
+  padding-bottom: 70px; 
   border-top: 1px solid #e0e0e0;
   background: #ffffff;
-  width: 100%; /* ensure full width */
-  box-sizing: border-box; /* makes padding part of width */
+  width: 100%; 
+  box-sizing: border-box; 
 }
 
 .input-container {
   display: flex;
   gap: 12px;
-  width: 100%; /* full width */
-  box-sizing: border-box; /* include padding/borders in width */
+  width: 100%; 
+  box-sizing: border-box; 
 }
 
 .message-input {
   flex-grow: 1;
-  min-width: 0; /* this is crucial to prevent overflow on flex children */
+  min-width: 0; 
   padding: 12px 16px;
   border-radius: 25px;
   border: 1px solid #ccc;
@@ -368,7 +368,7 @@ body, html {
 }
 
 .send-btn {
-  flex-shrink: 0; /* prevent the button from shrinking */
+  flex-shrink: 0; 
   padding: 12px 20px;
   background: #2575fc;
   border: none;
