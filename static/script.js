@@ -257,6 +257,10 @@ function updateUserList(filter = '') {
       updateUserList();
     };
 
+    if (!sidebar.classList.contains('collapsed')) {
+      toggleBtn.click();
+    }
+
     chatUsersList.appendChild(li);
   });
 }
