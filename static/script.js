@@ -1,3 +1,31 @@
+// ======= Toast Function =======
+function showToast(message, type = 'success') {
+  const toastContainer = document.getElementById('toast-container');
+  if (!toastContainer) {
+    console.error('Toast container not found.');
+    return;
+  }
+
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+
+  toastContainer.appendChild(toast);
+
+  // Trigger the transition by adding .show (after it's in the DOM)
+  setTimeout(() => {
+    toast.classList.add('show');
+  }, 100);  // Delay helps ensure CSS transitions fire properly
+
+  // Remove toast after 10 seconds (fade-out + removal)
+  setTimeout(() => {
+    toast.classList.remove('show');
+    // Wait for fade-out to finish before removing the element (400ms = CSS transition)
+    setTimeout(() => {
+      toast.remove();
+    }, 400);
+  }, 6000);
+}
 
 // ========== SIGNUP ==========
 const signupForm = document.getElementById('signup-form');
@@ -14,15 +42,19 @@ if (signupForm) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, username, password })
       });
+
       const data = await res.json();
+
       if (res.ok) {
-        alert('Signup successful! Login now.');
-        window.location.href = '/login';
+        showToast(data.detail || 'Signup successful! Login now.', 'success');
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 1500);
       } else {
-        alert(data.detail || 'Signup failed.');
+        showToast(data.detail || 'Signup failed.', 'error');
       }
     } catch (err) {
-      alert('Something went wrong.');
+      showToast('Something went wrong during signup.', 'error');
     }
   });
 }
@@ -41,47 +73,50 @@ if (loginForm) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
+
       const data = await res.json();
+
       if (res.ok && data.success) {
         localStorage.setItem('loggedIn', true);
         localStorage.setItem('username', username);
+        // Don't store passwords in localStorage! (Security issue)
         localStorage.setItem('password', password);
-        window.location.href = '/chat';
+        showToast(data.detail || 'Login successful! Redirecting...', 'success');
+        setTimeout(() => {
+          window.location.href = '/chat';
+        }, 1500);
       } else {
-        alert(data.detail || 'Login failed.');
+        showToast(data.detail || 'Login failed.', 'error');
       }
     } catch (err) {
-      alert('Login error.');
+      showToast('Something went wrong during login.', 'error');
     }
   });
 }
-
-// ========== CHAT LOGIC ==========
 
 const messagesDiv = document.getElementById('messages');
 const chatUsersList = document.getElementById('chat-users');
 const messageInput = document.getElementById('message-input');
 const currentChatHeading = document.getElementById('current-chat');
 const newUserBtn = document.getElementById('new-user-btn');
-const searchFriendsInput = document.getElementById('search-friends-input'); // New search input
+const searchFriendsInput = document.getElementById('search-friends-input');
 
 let currentRecipient = null;
 let chatHistory = {};
 let messageIds = {};
-let friendsList = []; // Store friends here
+let friendsList = [];
+
+// ====================== INITIALIZATION ======================
 
 if (messagesDiv && chatUsersList) {
   if (!localStorage.getItem('loggedIn')) {
+    showToast('You must be logged in to access chat.', 'error');
     window.location.href = 'login.html';
   }
 
-  fetchFriends(); // Load friends when chat starts
-
-  setInterval(() => {
-    scanMessages();
-  }, 5000);
-
+  fetchFriends();
   scanMessages();
+  setInterval(scanMessages, 5000);
 }
 
 // ====================== SCAN MESSAGES ======================
@@ -89,7 +124,11 @@ if (messagesDiv && chatUsersList) {
 async function scanMessages() {
   const username = localStorage.getItem('username');
   const password = localStorage.getItem('password');
-  if (!username || !password) return;
+
+  if (!username || !password) {
+    showToast('Authentication details missing.', 'error');
+    return;
+  }
 
   try {
     const res = await fetch('https://shubhendu-ghosh-whispra.hf.space/scan_messages', {
@@ -99,30 +138,32 @@ async function scanMessages() {
     });
 
     const data = await res.json();
+
+    if (!res.ok) {
+      showToast(data.detail || 'Failed to scan messages.', 'error');
+      console.error('Scan messages error:', data);
+      return;
+    }
+
     const messages = data.messages || [];
     let newMessageFound = false;
 
-    for (let msg of messages) {
+    messages.forEach(msg => {
       const fromUser = msg.from_username;
       const toUser = msg.to_username || username;
       const otherUser = (fromUser === username) ? toUser : fromUser;
-
       const decodedMsg = decodeMessage(msg.message);
 
-      const messageId = `${fromUser}-${decodedMsg}-${msg.timestamp || Date.now()}`;
+      const messageId = `${msg.timestamp}-${fromUser}-${toUser}`;
 
       if (!messageIds[messageId]) {
         messageIds[messageId] = true;
 
         if (!chatHistory[otherUser]) {
           chatHistory[otherUser] = [];
-
-          // New user found, check if they're in friendsList
           if (!friendsList.includes(otherUser)) {
             friendsList.push(otherUser);
             updateUserList();
-
-            // Save new friend to backend
             saveFriend(otherUser);
           }
         }
@@ -134,26 +175,32 @@ async function scanMessages() {
 
         newMessageFound = true;
       }
-    }
+    });
 
     if (newMessageFound) {
       updateUserList();
+
       if (!currentRecipient && Object.keys(chatHistory).length > 0) {
         currentRecipient = Object.keys(chatHistory)[0];
       }
+
       if (currentRecipient) {
         displayMessages(currentRecipient);
       }
     }
   } catch (err) {
-    console.error('Scan failed.', err);
+    showToast('Error scanning messages.', 'error');
+    console.error('Scan messages catch error:', err);
   }
 }
 
 // ====================== DISPLAY MESSAGES ======================
 
 function displayMessages(user) {
-  if (!user) return;
+  if (!user) {
+    showToast('No user selected.', 'error');
+    return;
+  }
 
   const username = localStorage.getItem('username');
   const messages = chatHistory[user] || [];
@@ -167,12 +214,11 @@ function displayMessages(user) {
 
     if (msg.from_username === username) {
       p.classList.add('sent');
-      p.textContent = msg.message;
     } else {
       p.classList.add('received');
-      p.textContent = msg.message;
     }
 
+    p.textContent = msg.message;
     messagesDiv.appendChild(p);
   });
 
@@ -183,8 +229,10 @@ function displayMessages(user) {
 
 function updateUserList(filter = '') {
   chatUsersList.innerHTML = '';
-  const users = Object.keys(chatHistory);
-  const filteredFriends = friendsList.filter(friend => friend.toLowerCase().includes(filter.toLowerCase()));
+
+  const filteredFriends = friendsList.filter(friend =>
+    friend.toLowerCase().includes(filter.toLowerCase())
+  );
 
   if (filteredFriends.length === 0) {
     const li = document.createElement('li');
@@ -219,10 +267,22 @@ async function sendMessage() {
   const fromUser = localStorage.getItem('username');
   const password = localStorage.getItem('password');
 
-  let toUser = currentRecipient;
-  if (!toUser) return alert('Choose or enter a username!');
+  if (!fromUser || !password) {
+    showToast('Authentication error.', 'error');
+    return;
+  }
+
+  const toUser = currentRecipient;
+  if (!toUser) {
+    showToast('Please select a recipient!', 'error');
+    return;
+  }
+
   const message = messageInput.value.trim();
-  if (!message) return alert('Message cannot be empty!');
+  if (!message) {
+    showToast('Message cannot be empty!', 'error');
+    return;
+  }
 
   const encodedMessage = encodeMessage(message);
 
@@ -240,40 +300,42 @@ async function sendMessage() {
 
     const data = await res.json();
 
-    if (res.ok) {
-      const newMsg = {
-        from_username: fromUser,
-        to_username: toUser,
-        message,
-        timestamp: Date.now()
-      };
-
-      if (!chatHistory[toUser]) {
-        chatHistory[toUser] = [];
-
-        // If sending to a new friend, add to friends list and save backend
-        if (!friendsList.includes(toUser)) {
-          friendsList.push(toUser);
-          saveFriend(toUser);
-        }
-      }
-
-      chatHistory[toUser].push(newMsg);
-
-      const messageId = `${fromUser}-${message}-${newMsg.timestamp}`;
-      messageIds[messageId] = true;
-
-      displayMessages(toUser);
-      updateUserList();
-
-      messageInput.value = '';
-      scanMessages();
-    } else {
-      alert(data.message || 'Failed to send message.');
+    if (!res.ok) {
+      showToast(data.detail || 'Failed to send message.', 'error');
+      console.error('Send message error:', data);
+      return;
     }
+
+    const newMsg = {
+      from_username: fromUser,
+      to_username: toUser,
+      message,
+      timestamp: Date.now()
+    };
+
+    if (!chatHistory[toUser]) {
+      chatHistory[toUser] = [];
+      if (!friendsList.includes(toUser)) {
+        friendsList.push(toUser);
+        saveFriend(toUser);
+      }
+    }
+
+    chatHistory[toUser].push(newMsg);
+
+    const messageId = `${newMsg.timestamp}-${fromUser}-${toUser}`;
+    messageIds[messageId] = true;
+
+    displayMessages(toUser);
+    updateUserList();
+
+    messageInput.value = '';
+    scanMessages();
+
+    showToast('Message sent!', 'success');
   } catch (err) {
-    alert('Message send error.');
-    console.error(err);
+    showToast('Message send error.', 'error');
+    console.error('Send message catch error:', err);
   }
 }
 
@@ -282,20 +344,28 @@ async function sendMessage() {
 async function fetchFriends() {
   const username = localStorage.getItem('username');
   const password = localStorage.getItem('password');
-  if (!username || !password) return;
+
+  if (!username || !password) {
+    showToast('Authentication error fetching friends.', 'error');
+    return;
+  }
 
   try {
     const res = await fetch(`https://shubhendu-ghosh-whispra.hf.space/get_friends?username=${username}&password=${password}`);
+
     const data = await res.json();
 
-    if (res.ok) {
-      friendsList = data || [];
-      updateUserList();
-    } else {
-      console.error('Failed to fetch friends:', data.message);
+    if (!res.ok) {
+      showToast(data.detail || 'Failed to fetch friends.', 'error');
+      console.error('Fetch friends error:', data);
+      return;
     }
+
+    friendsList = data || [];
+    updateUserList();
   } catch (err) {
-    console.error('Fetch friends error:', err);
+    showToast('Error fetching friends.', 'error');
+    console.error('Fetch friends catch error:', err);
   }
 }
 
@@ -304,7 +374,11 @@ async function fetchFriends() {
 async function saveFriend(friendUsername) {
   const username = localStorage.getItem('username');
   const password = localStorage.getItem('password');
-  if (!username || !password) return;
+
+  if (!username || !password) {
+    showToast('Authentication error saving friend.', 'error');
+    return;
+  }
 
   try {
     const res = await fetch('https://shubhendu-ghosh-whispra.hf.space/save_friends', {
@@ -319,19 +393,16 @@ async function saveFriend(friendUsername) {
 
     const data = await res.json();
 
-    if (res.ok) {
-      console.log(`Friend "${friendUsername}" added successfully!`);
-
-      if (!friendsList.includes(friendUsername)) {
-        friendsList.push(friendUsername);
-      }
-
-      updateUserList();
-    } else {
-      console.error(`Failed to add friend "${friendUsername}":`, data.message);
+    if (!res.ok) {
+      showToast(data.detail || 'Failed to save friend.', 'error');
+      console.error('Save friend error:', data);
+      return;
     }
+
+    showToast(`Friend "${friendUsername}" saved!`, 'success');
   } catch (err) {
-    console.error('Save friend error:', err);
+    showToast('Error saving friend.', 'error');
+    console.error('Save friend catch error:', err);
   }
 }
 
@@ -339,7 +410,7 @@ async function saveFriend(friendUsername) {
 
 function logout() {
   localStorage.clear();
-  window.location.href = '/';
+  window.location.href = 'login.html';
 }
 
 // ====================== EVENT LISTENERS ======================
@@ -355,7 +426,7 @@ if (newUserBtn) {
 
       if (!friendsList.includes(trimmedUser)) {
         friendsList.push(trimmedUser);
-        saveFriend(trimmedUser); // Save new friend to backend
+        saveFriend(trimmedUser);
       }
 
       currentChatHeading.textContent = `Chatting with ${trimmedUser}`;
@@ -371,6 +442,7 @@ if (searchFriendsInput) {
     updateUserList(searchTerm);
   });
 }
+
 
 // ====================== MESSAGE ENCODER / DECODER ======================
 
