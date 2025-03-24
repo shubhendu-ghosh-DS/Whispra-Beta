@@ -100,10 +100,12 @@ body, html {
   padding: 15px 20px;
   background: rgba(255, 255, 255, 0.05);
   transition: padding 0.3s ease;
+  box-sizing: border-box;
 }
 
 .search-input {
   width: 100%;
+  box-sizing: border-box;
   padding: 10px 14px;
   font-size: 0.95rem;
   border: none;
