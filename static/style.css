@@ -98,7 +98,7 @@ body, html {
 /* Media query for mobile devices */
 @media (max-width: 768px) {
   .sidebar {
-    width: 100px; 
+    width: 120px; 
   }
   
   .sidebar header h2 {
@@ -129,6 +129,23 @@ body, html {
 
 .search-input:focus {
   background: rgba(255, 255, 255, 0.25);
+}
+
+@media (max-width: 768px) {
+  .search-container {
+    padding: 10px 10px; 
+  }
+
+  .search-input {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 480px) {
+    .search-container {
+      display: none;
+    }
+  }
 }
 
 .user-list {
