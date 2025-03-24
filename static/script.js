@@ -410,7 +410,7 @@ async function saveFriend(friendUsername) {
 
 function logout() {
   localStorage.clear();
-  window.location.href = 'login.html';
+  window.location.href = '/';
 }
 
 // ====================== EVENT LISTENERS ======================
