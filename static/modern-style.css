@@ -1,0 +1,242 @@
+/* Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  /* Body Styling */
+  body {
+    height: 100vh;
+    background: linear-gradient(135deg, #FFDEE9, #B5FFFC);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    color: #333;
+  }
+  
+  /* Background Shapes */
+  .shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.4;
+    animation: float 10s infinite ease-in-out;
+    z-index: 0;
+  }
+  
+  .shape.one {
+    width: 150px;
+    height: 150px;
+    background: #FF512F;
+    top: -50px;
+    left: -50px;
+    animation-delay: 0s;
+  }
+  
+  .shape.two {
+    width: 200px;
+    height: 200px;
+    background: #6a11cb;
+    top: 20%;
+    right: -100px;
+    animation-delay: 2s;
+  }
+  
+  .shape.three {
+    width: 100px;
+    height: 100px;
+    background: #2575fc;
+    bottom: 10%;
+    left: 20px;
+    animation-delay: 4s;
+  }
+  
+  .shape.four {
+    width: 300px;
+    height: 300px;
+    background: #FFD700;
+    bottom: -150px;
+    right: -150px;
+    animation-delay: 6s;
+  }
+  
+  @keyframes float {
+    0% {
+      transform: translateY(0) translateX(0);
+    }
+    50% {
+      transform: translateY(-20px) translateX(20px);
+    }
+    100% {
+      transform: translateY(0) translateX(0);
+    }
+  }
+  
+  /* Form Container */
+  .form-container {
+    background: #fff;
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    animation: fadeIn 1s ease forwards;
+  }
+  
+  /* App Title */
+  .app-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #4A00E0;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .app-title .beta {
+    background: #FF512F;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-left: 10px;
+    animation: pulse 1.5s infinite;
+  }
+  
+  /* Heading */
+  h2 {
+    color: #333;
+    margin-bottom: 25px;
+    font-weight: 600;
+  }
+  
+  /* Input Fields */
+  form input {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 10px 0;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    transition: 0.3s ease;
+    font-size: 1rem;
+  }
+  
+  form input:focus {
+    outline: none;
+    border-color: #6a11cb;
+    box-shadow: 0 0 8px rgba(106, 17, 203, 0.2);
+  }
+  
+  /* Button */
+  .primary-btn {
+    width: 100%;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: #fff;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+    margin-top: 15px;
+  }
+  
+  .primary-btn:hover {
+    background: linear-gradient(to right, #2575fc, #6a11cb);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(106, 17, 203, 0.3);
+  }
+  
+  /* Links */
+  p {
+    margin-top: 20px;
+    font-size: 0.9rem;
+  }
+  
+  p a {
+    color: #6a11cb;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  
+  p a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  /* Responsive */
+  @media (max-width: 480px) {
+    .form-container {
+      padding: 30px 20px;
+    }
+  
+    .app-title {
+      font-size: 1.5rem;
+    }
+  }
+  
+
+  /* Toast ======================= */
+
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+  }
+  
+  .toast {
+    margin-bottom: 10px;
+    padding: 12px 20px;
+    border-radius: 20px;
+    color: #fff;
+    font-size: 14px;
+    animation: fadeInOut 10s forwards;
+  }
+  
+  .toast.success {
+    background-color: #4caf50;
+  }
+  
+  .toast.error {
+    background-color: #f44336;
+  }
+  
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-10px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-10px); }
+  }
+  
