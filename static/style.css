@@ -122,34 +122,6 @@ body, html {
   background: rgba(255, 255, 255, 0.25);
 }
 
-/* ===== MEDIA QUERIES ===== */
-
-/* Tablet & smaller devices */
-@media (max-width: 768px) {
-  .sidebar {
-    width: 120px; /* Shrink sidebar */
-  }
-
-  .sidebar header h2 {
-    font-size: 1rem;
-  }
-
-  .search-container {
-    padding: 10px 10px;
-  }
-
-  .search-input {
-    padding: 8px 10px;
-    font-size: 0.8rem;
-  }
-}
-
-/* Very small screens (mobile) */
-@media (max-width: 480px) {
-  .search-container {
-    display: none; /* Hide search box on very small screens */
-  }
-}
 
 .user-list {
   list-style: none;
