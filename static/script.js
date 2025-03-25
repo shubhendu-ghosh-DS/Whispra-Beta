@@ -462,15 +462,21 @@ cancelChatBtn.addEventListener('click', () => {
 // ====================== MESSAGE ENCODER / DECODER ======================
 
 function encodeMessage(message) {
-  return btoa(unescape(encodeURIComponent(message)));
+  const encoder = new TextEncoder();
+  const encoded = encoder.encode(message);
+  return btoa(String.fromCharCode(...encoded));
 }
 
 function decodeMessage(encodedMessage) {
   try {
-    return decodeURIComponent(escape(atob(encodedMessage)));
+    const binaryString = atob(encodedMessage);
+    const bytes = new Uint8Array([...binaryString].map(char => char.charCodeAt(0)));
+    const decoder = new TextDecoder();
+    return decoder.decode(bytes);
   } catch (e) {
     return encodedMessage;
   }
+}
 
 
 
