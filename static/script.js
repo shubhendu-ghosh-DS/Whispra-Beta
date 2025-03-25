@@ -462,16 +462,16 @@ cancelChatBtn.addEventListener('click', () => {
 // ====================== MESSAGE ENCODER / DECODER ======================
 
 function encodeMessage(message) {
-  return btoa(message);
+  return btoa(unescape(encodeURIComponent(message)));
 }
 
 function decodeMessage(encodedMessage) {
   try {
-    return atob(encodedMessage);
+    return decodeURIComponent(escape(atob(encodedMessage)));
   } catch (e) {
     return encodedMessage;
   }
-}
+
 
 
 // ========================== togglr 
