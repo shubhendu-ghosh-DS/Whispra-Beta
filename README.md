@@ -4,7 +4,7 @@
 
 ## 🌐 Live Demo
 
-The application is hosted on [Hugging Face Spaces](https://huggingface.co/spaces/shubhendu-ghosh-whispra).
+The application is hosted on [HuggingFace Space](https://shubhendu-ghosh-whispra-beta.hf.space).
 
 ---
 
@@ -93,7 +93,7 @@ This will expose the application at `http://localhost:7860`.
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/whispra-beta.git
+git clone https://huggingface.co/spaces/shubhendu-ghosh/whispra-beta
 cd whispra-beta
 
 # Install dependencies
