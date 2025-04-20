@@ -130,6 +130,13 @@ This is the frontend application that interacts with the **Whispra** backend ser
 
 ---
 
+## 👤 Author
+
+**Shubhendu Ghosh**  
+🔗 [LinkedIn](https://www.linkedin.com/in/shubhendu-ghosh-ds/)
+
+---
+
 ## 📄 License
 
 This project is licensed under the MIT License. See `LICENSE` for more details.
