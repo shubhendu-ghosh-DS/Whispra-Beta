@@ -8,6 +8,14 @@ The application is hosted on [HuggingFace Space](https://shubhendu-ghosh-whispra
 
 ---
 
+## Screenshots
+
+![](https://github.com/shubhendu-ghosh-DS/Whispra-Beta/blob/main/static/Screenshot%202025-04-20%20205935.png?raw=true)
+![](https://github.com/shubhendu-ghosh-DS/Whispra-Beta/blob/main/static/Screenshot%202025-04-20%20205946.png?raw=true)
+![](https://github.com/shubhendu-ghosh-DS/Whispra-Beta/blob/main/static/Screenshot%202025-04-20%20210034.png?raw=true)
+
+---
+
 ## 📁 Project Structure
 
 ```
